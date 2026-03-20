@@ -286,8 +286,6 @@ function processDashboardData(data) {
         targetYear = today.getFullYear();
     }
     
-    document.getElementById('current-month-name').textContent = MONTHS[targetMonth - 1];
-
     let totalYear = 0;
     let totalMonth = 0;
     let tomasMonthPaid = 0;
