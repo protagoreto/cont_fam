@@ -4,6 +4,7 @@ const GAS_PASS_KEY = 'family_accounting_gas_pass';
 let gasUrl = localStorage.getItem(GAS_URL_KEY) || '';
 let gasPass = localStorage.getItem(GAS_PASS_KEY) || '';
 let chartInstance = null;
+let globalExpensesData = []; // NEW
 
 // --- DOM ELEMENTS ---
 const views = {
@@ -47,8 +48,11 @@ function init() {
     setupForm();
     setupModal();
     
-    // Global Refresh
+    // Global Refresh & Selector
     document.getElementById('refresh-global-btn').addEventListener('click', loadDashboardData);
+    document.getElementById('month-selector').addEventListener('change', () => {
+        processDashboardData(globalExpensesData);
+    });
 }
 
 // --- NAVIGATION ---
@@ -212,7 +216,9 @@ async function loadDashboardData() {
             return;
         }
         
-        processDashboardData(Array.isArray(dataObjects) ? dataObjects : []);
+        globalExpensesData = Array.isArray(dataObjects) ? dataObjects : [];
+        populateMonthSelector(globalExpensesData);
+        processDashboardData(globalExpensesData);
         
         const now = new Date();
         document.getElementById('last-sync-time').textContent = `Act. ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
@@ -225,17 +231,60 @@ async function loadDashboardData() {
         document.getElementById('dashboard-loading').innerHTML = `
             <i class="ri-wifi-off-line" style="font-size: 30px; color: #ef4444; margin-bottom: 10px;"></i>
             <p style="color: #ef4444; font-size: 0.9rem;">Error de conexión.</p>
-            <p style="color: #94a3b8; font-size: 0.7rem; margin-top: 5px;">Asegúrate de haber implementado una NUEVA VERSIÓN en Apps Script.</p>
         `;
     }
 }
 
-function processDashboardData(data) {
-    const today = new Date();
-    const currentMonth = today.getMonth() + 1;
-    const currentYear = today.getFullYear();
+function populateMonthSelector(data) {
+    const selector = document.getElementById('month-selector');
+    const prevValue = selector.value;
     
-    document.getElementById('current-month-name').textContent = MONTHS[currentMonth - 1];
+    let monthsSet = new Set();
+    const today = new Date();
+    monthsSet.add(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`);
+    
+    data.forEach(row => {
+        if (!row.FECHA) return;
+        const d = new Date(row.FECHA);
+        if (!isNaN(d.getTime())) {
+            monthsSet.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+        }
+    });
+    
+    const sortedMonths = Array.from(monthsSet).sort().reverse();
+    
+    selector.innerHTML = '';
+    sortedMonths.forEach(ym => {
+        const [y, m] = ym.split('-');
+        const monthName = MONTHS[parseInt(m) - 1];
+        const opt = document.createElement('option');
+        opt.value = ym;
+        opt.textContent = `${monthName} ${y}`;
+        selector.appendChild(opt);
+    });
+    
+    if (prevValue && monthsSet.has(prevValue)) {
+        selector.value = prevValue;
+    } else {
+        selector.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+    }
+}
+
+function processDashboardData(data) {
+    const selectorVal = document.getElementById('month-selector').value;
+    let targetMonth, targetYear;
+    
+    if (selectorVal) {
+        const parts = selectorVal.split('-');
+        targetYear = parseInt(parts[0]);
+        targetMonth = parseInt(parts[1]);
+    } else {
+        const today = new Date();
+        targetMonth = today.getMonth() + 1;
+        targetYear = today.getFullYear();
+    }
+    
+    document.getElementById('current-month-name').textContent = MONTHS[targetMonth - 1];
 
     let totalYear = 0;
     let totalMonth = 0;
@@ -244,6 +293,7 @@ function processDashboardData(data) {
     
     let chartDataTypes = {};
     let recentHTML = '';
+    let recentCount = 0;
 
     // Filtrar reverso (últimos primero)
     data.slice().reverse().forEach((row, index) => {
@@ -254,10 +304,10 @@ function processDashboardData(data) {
         const importe = parseFloat(row.IMPORTE) || 0;
 
         // Anuales
-        if (rowYear === currentYear) totalYear += importe;
+        if (rowYear === targetYear) totalYear += importe;
 
         // Mensuales
-        if (rowYear === currentYear && rowMonth === currentMonth) {
+        if (rowYear === targetYear && rowMonth === targetMonth) {
             totalMonth += importe;
             if (row.COMPRADOR === 'Tomás') tomasMonthPaid += importe;
             if (row.COMPRADOR === 'Estefanía') esteMonthPaid += importe;
@@ -267,8 +317,8 @@ function processDashboardData(data) {
             chartDataTypes[tipo] = (chartDataTypes[tipo] || 0) + importe;
         }
 
-        // Historial Reciente (los 5 últimos globales)
-        if (index < 5) {
+        // Historial Reciente (los 5 últimos globales del mes seleccionado)
+        if (rowYear === targetYear && rowMonth === targetMonth && recentCount < 5) {
             const isTomas = row.COMPRADOR === 'Tomás';
             const dateStr = `${dateObj.getDate().toString().padStart(2,'0')}/${(dateObj.getMonth()+1).toString().padStart(2,'0')}`;
             recentHTML += `
@@ -285,11 +335,12 @@ function processDashboardData(data) {
                     <span class="exp-amount">${importe.toFixed(2)}€</span>
                 </div>
             `;
+            recentCount++;
         }
     });
 
-    // Validar si está vacío el local
-    if(recentHTML === '') recentHTML = '<p class="small-text center mt-10">Sin gastos registrados</p>';
+    // Validar si está vacío el local para ese mes
+    if(recentHTML === '') recentHTML = '<p class="small-text center mt-10">Sin gastos este mes</p>';
     document.getElementById('recent-expenses').innerHTML = recentHTML;
 
     // Actualizar Textos
