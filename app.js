@@ -293,7 +293,6 @@ function processDashboardData(data) {
     
     let chartDataTypes = {};
     let recentHTML = '';
-    let recentCount = 0;
 
     // Filtrar reverso (últimos primero)
     data.slice().reverse().forEach((row, index) => {
@@ -317,12 +316,12 @@ function processDashboardData(data) {
             chartDataTypes[tipo] = (chartDataTypes[tipo] || 0) + importe;
         }
 
-        // Historial Reciente (los 5 últimos globales del mes seleccionado)
-        if (rowYear === targetYear && rowMonth === targetMonth && recentCount < 5) {
+        // Historial Mensual Completo
+        if (rowYear === targetYear && rowMonth === targetMonth) {
             const isTomas = row.COMPRADOR === 'Tomás';
             const dateStr = `${dateObj.getDate().toString().padStart(2,'0')}/${(dateObj.getMonth()+1).toString().padStart(2,'0')}`;
             recentHTML += `
-                <div class="expense-item slide-up" style="animation-delay: ${index * 0.1}s">
+                <div class="expense-item slide-up" style="animation-delay: ${(index < 15 ? index * 0.05 : 0)}s">
                     <div class="exp-left">
                         <div class="exp-avatar" style="background: ${isTomas ? 'var(--tomas-color)' : 'var(--este-color)'}">
                             ${isTomas ? 'T' : 'E'}
@@ -335,7 +334,6 @@ function processDashboardData(data) {
                     <span class="exp-amount">${importe.toFixed(2)}€</span>
                 </div>
             `;
-            recentCount++;
         }
     });
 
