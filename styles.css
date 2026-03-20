@@ -116,6 +116,7 @@ body {
     font-weight: 800;
     background: linear-gradient(to right, #fff, #94a3b8);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 .header-actions {
@@ -196,6 +197,40 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
+}
+.month-selector-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 0 10px;
+    transition: all 0.3s;
+}
+.month-selector-wrapper i {
+    font-size: 1rem;
+    pointer-events: none;
+    margin-left: -5px;
+}
+.month-selector-wrapper:hover {
+    background: rgba(255,255,255,0.3);
+}
+.clean-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: inherit;
+    padding: 6px 15px 6px 5px;
+    outline: none;
+    cursor: pointer;
+}
+.clean-select option {
+    background: var(--bg-card);
+    color: white;
 }
 .badge {
     background: rgba(255,255,255,0.2);
