@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Contabilidad Familiar</title>
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Premium Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- Chart.js for Dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Animated Background Elements -->
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+
+    <div id="app">
+        <!-- HEADER -->
+        <header class="topbar glass-fx">
+            <div class="user-greeting">
+                <p>Hola Familia</p>
+                <h1>Resumen Financiero</h1>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn tooltip" id="refresh-global-btn">
+                    <i class="ri-refresh-line"></i>
+                </button>
+                <div class="avatar-group">
+                    <div class="avatar tomas">T</div>
+                    <div class="avatar este">E</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN CONTAINER -->
+        <main class="content-area">
+            
+            <!-- ====== VISTA: DASHBOARD ====== -->
+            <section id="view-dashboard" class="page-view active">
+                
+                <!-- Loading State -->
+                <div id="dashboard-loading" class="spinner-container">
+                    <div class="loader"></div>
+                    <p>Sincronizando con Sheets...</p>
+                </div>
+
+                <div id="dashboard-content" class="fade-in" style="display: none;">
+                    
+                    <!-- Tarjeta Principal (Balance) -->
+                    <div class="balance-card premium-gradient shadow-glow">
+                        <div class="card-top">
+                            <span class="badge">Mes de <span id="current-month-name"></span></span>
+                            <i class="ri-scales-3-line icon-big"></i>
+                        </div>
+                        <h2 class="balance-title" id="balance-result">Todo al día</h2>
+                        <p class="balance-subtitle" id="balance-subtext">50% igualado perfectamente</p>
+                        
+                        <div class="balance-details">
+                            <div class="detail-col">
+                                <span>Gastos Totales</span>
+                                <h3 id="total-month">0.00€</h3>
+                            </div>
+                            <div class="detail-col right">
+                                <span>Total Año</span>
+                                <h3 id="total-year">0.00€</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráfico -->
+                    <div class="chart-container glass-card">
+                        <div class="card-header">
+                            <h3>Aportaciones del Mes</h3>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="expenseChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Desglose por Comprador -->
+                    <div class="split-grid">
+                        <div class="split-card glass-card">
+                            <div class="split-icon tomas-bg">
+                                <i class="ri-user-smile-line"></i>
+                            </div>
+                            <div class="split-info">
+                                <span>Tomás pagó</span>
+                                <h4 id="tomas-paid">0.00€</h4>
+                            </div>
+                        </div>
+                        <div class="split-card glass-card">
+                            <div class="split-icon este-bg">
+                                <i class="ri-user-heart-line"></i>
+                            </div>
+                            <div class="split-info">
+                                <span>Estefanía pagó</span>
+                                <h4 id="estefania-paid">0.00€</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Historial Reciente -->
+                    <div class="recent-list glass-card">
+                        <div class="card-header border-b">
+                            <h3>Últimos Gastos</h3>
+                            <span class="small-text" id="last-sync-time">Act. ahora</span>
+                        </div>
+                        <div id="recent-expenses" class="expense-items">
+                            <!-- JS injected items -->
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ====== VISTA: AÑADIR GASTO ====== -->
+            <section id="view-add" class="page-view">
+                <div class="glass-card full-height-card slide-up">
+                    <div class="card-header center">
+                        <div class="icon-circle shadow-glow pulse">
+                            <i class="ri-add-line"></i>
+                        </div>
+                        <h2>Registrar Nuevo Gasto</h2>
+                    </div>
+
+                    <form id="expense-form" class="modern-form">
+                        
+                        <div class="input-group">
+                            <label>Fecha del gasto</label>
+                            <div class="input-wrapper">
+                                <i class="ri-calendar-event-line"></i>
+                                <input type="date" id="fecha" name="fecha" required>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label>¿Quién ha pagado?</label>
+                            <div class="segmented-control">
+                                <input type="radio" id="buyer-tomas" name="comprador" value="Tomás" required>
+                                <label for="buyer-tomas" class="segment tomas-segment">Tomás</label>
+                                
+                                <input type="radio" id="buyer-estefania" name="comprador" value="Estefanía">
+                                <label for="buyer-estefania" class="segment este-segment">Estefanía</label>
+                            </div>
+                        </div>
+
+                        <div class="row-flex">
+                            <div class="input-group half">
+                                <label>Categoría</label>
+                                <div class="input-wrapper">
+                                    <i class="ri-price-tag-3-line"></i>
+                                    <select id="tipo" name="tipo" required>
+                                        <option value="" disabled selected>Tipo</option>
+                                        <option value="Alimentacion">Alimentación</option>
+                                        <option value="Ocio">Ocio</option>
+                                        <option value="Teleco">Teleco</option>
+                                        <option value="Vivienda">Vivienda</option>
+                                        <option value="Varios">Varios</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="input-group half">
+                                <label>Concepto</label>
+                                <div class="input-wrapper">
+                                    <i class="ri-shopping-bag-3-line"></i>
+                                    <select id="concepto" name="concepto" required>
+                                        <option value="" disabled selected>Elegir</option>
+                                        <option value="AGUA">Agua</option>
+                                        <option value="AMAZON">Amazon</option>
+                                        <option value="APARCAMIENTO">Aparcamiento</option>
+                                        <option value="APERITIVO FUERA">Aperitivo Fuera</option>
+                                        <option value="AUCORSA">Aucorsa</option>
+                                        <option value="BAR PLAZA">Bar Plaza</option>
+                                        <option value="BAZAR CHINO">Bazar Chino</option>
+                                        <option value="BBVA">BBVA</option>
+                                        <option value="CARNICERÍA ALMUDENA">Carnicería Almudena</option>
+                                        <option value="CENAR FUERA">Cenar Fuera</option>
+                                        <option value="COMER FUERA">Comer Fuera</option>
+                                        <option value="DECATHLON">Decathlon</option>
+                                        <option value="DESAYUNAR FUERA">Desayunar Fuera</option>
+                                        <option value="DEZA">Deza</option>
+                                        <option value="DISNEY">Disney</option>
+                                        <option value="DORMIR FUERA">Dormir Fuera</option>
+                                        <option value="EL CORTE INGLES">El Corte Ingles</option>
+                                        <option value="FARMACIA">Farmacia</option>
+                                        <option value="FERRETERIA ENCUENTRA">Ferretería</option>
+                                        <option value="FRUTAS CABELLO">Frutas</option>
+                                        <option value="GASOLINERA">Gasolinera</option>
+                                        <option value="IMPUESTO">Impuesto</option>
+                                        <option value="INTERNET">Internet</option>
+                                        <option value="LEROY MERLIN">Leroy Merlin</option>
+                                        <option value="LOTERÍA">Lotería</option>
+                                        <option value="LUZ CASA">Luz Casa</option>
+                                        <option value="MASAHORRO">MasAhorro</option>
+                                        <option value="MERCADONA">Mercadona</option>
+                                        <option value="MORESIL">Moresil</option>
+                                        <option value="OBRAMAT">Obramat</option>
+                                        <option value="PASTELERÍA ROLDÁN">Pastelería</option>
+                                        <option value="PESCADERÍA">Pescadería</option>
+                                        <option value="REGALO">Regalo</option>
+                                        <option value="SANEAMIENTOS CRUZ">Saneamientos</option>
+                                        <option value="VARIOS">Varios</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Importe</label>
+                            <div class="amount-wrapper">
+                                <span class="currency">€</span>
+                                <input type="number" id="importe" name="importe" step="0.01" min="0" placeholder="0.00" required>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Notas Adicionales (Opcional)</label>
+                            <div class="input-wrapper align-top">
+                                <i class="ri-file-text-line"></i>
+                                <textarea id="info" name="info" rows="2" placeholder="Información extra..."></textarea>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-submit premium-hover" id="submit-btn" disabled>
+                            <span>Guardar Gasto</span>
+                            <i class="ri-arrow-right-line"></i>
+                            <div class="loader-small" id="submit-spinner" style="display: none;"></div>
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- FLOATING BOTTOM NAVIGATION -->
+        <nav class="bottom-nav glass-fx">
+            <button class="nav-btn active" data-target="view-dashboard">
+                <i class="ri-dashboard-fill"></i>
+                <span>Dashboard</span>
+            </button>
+            <div class="nav-center">
+                <button class="fab add-btn" data-target="view-add">
+                    <i class="ri-add-line"></i>
+                </button>
+            </div>
+            <button class="nav-btn" data-target="view-settings" id="open-settings-from-nav">
+                <i class="ri-settings-4-line"></i>
+                <span>Ajustes</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- NOTIFICATION TOAST -->
+    <div id="toast" class="toast glass-card">
+        <i class="ri-check-line toast-icon"></i>
+        <span id="toast-msg">Mensaje</span>
+    </div>
+
+    <!-- ====== MODAL AJUSTES / SETUP INICIAL ====== -->
+    <div id="settings-modal" class="modal-overlay">
+        <div class="modal-box glass-card slide-up">
+            <div class="modal-header">
+                <h2>Configuración</h2>
+                <button class="icon-btn close-modal"><i class="ri-close-line"></i></button>
+            </div>
+            <div class="modal-body modern-form">
+                <p class="modal-desc">Conecta la app con tu Google Sheet para empezar a registrar gastos al instante.</p>
+                
+                <div class="input-group">
+                    <label>URL de Apps Script</label>
+                    <div class="input-wrapper">
+                        <i class="ri-link"></i>
+                        <input type="url" id="gas-url-input" placeholder="https://script.google.com/macros/s/..." required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Contraseña Secreta</label>
+                    <div class="input-wrapper">
+                        <i class="ri-lock-password-line"></i>
+                        <input type="password" id="gas-password-input" placeholder="MITRUCHA2026" required>
+                    </div>
+                </div>
+
+                <div class="security-badge">
+                    <i class="ri-shield-check-fill"></i> <span>Conexión Segura</span>
+                </div>
+
+                <button id="save-url-btn" class="btn-submit premium-hover w-100">
+                    Guardar Configuración
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
