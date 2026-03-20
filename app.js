@@ -231,6 +231,8 @@ async function loadDashboardData() {
         document.getElementById('dashboard-loading').innerHTML = `
             <i class="ri-wifi-off-line" style="font-size: 30px; color: #ef4444; margin-bottom: 10px;"></i>
             <p style="color: #ef4444; font-size: 0.9rem;">Error de conexión.</p>
+            <p style="color: #94a3b8; font-size: 0.75rem; margin-top: 8px; word-break: break-word;">Detalle: ${error.message}</p>
+            <button onclick="openModal()" class="btn-submit" style="margin-top:15px; padding: 5px 15px; font-size: 0.8rem;">Revisar Enlace</button>
         `;
     }
 }
