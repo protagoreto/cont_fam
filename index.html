@@ -54,7 +54,12 @@
                     <!-- Tarjeta Principal (Balance) -->
                     <div class="balance-card premium-gradient shadow-glow">
                         <div class="card-top">
-                            <span class="badge">Mes de <span id="current-month-name"></span></span>
+                            <div class="month-selector-wrapper badge">
+                                <select id="month-selector" class="clean-select">
+                                    <!-- JS injected -->
+                                </select>
+                                <i class="ri-arrow-down-s-line"></i>
+                            </div>
                             <i class="ri-scales-3-line icon-big"></i>
                         </div>
                         <h2 class="balance-title" id="balance-result">Todo al día</h2>
@@ -170,41 +175,41 @@
                                     <i class="ri-shopping-bag-3-line"></i>
                                     <select id="concepto" name="concepto" required>
                                         <option value="" disabled selected>Elegir</option>
-                                        <option value="AGUA">Agua</option>
-                                        <option value="AMAZON">Amazon</option>
-                                        <option value="APARCAMIENTO">Aparcamiento</option>
-                                        <option value="APERITIVO FUERA">Aperitivo Fuera</option>
-                                        <option value="AUCORSA">Aucorsa</option>
-                                        <option value="BAR PLAZA">Bar Plaza</option>
-                                        <option value="BAZAR CHINO">Bazar Chino</option>
+                                        <option value="Agua">Agua</option>
+                                        <option value="Amazon">Amazon</option>
+                                        <option value="Aparcamiento">Aparcamiento</option>
+                                        <option value="Aperitivo Fuera">Aperitivo Fuera</option>
+                                        <option value="Aucorsa">Aucorsa</option>
+                                        <option value="Bar Plaza">Bar Plaza</option>
+                                        <option value="Bazar Chino">Bazar Chino</option>
                                         <option value="BBVA">BBVA</option>
-                                        <option value="CARNICERÍA ALMUDENA">Carnicería Almudena</option>
-                                        <option value="CENAR FUERA">Cenar Fuera</option>
-                                        <option value="COMER FUERA">Comer Fuera</option>
-                                        <option value="DECATHLON">Decathlon</option>
-                                        <option value="DESAYUNAR FUERA">Desayunar Fuera</option>
-                                        <option value="DEZA">Deza</option>
-                                        <option value="DISNEY">Disney</option>
-                                        <option value="DORMIR FUERA">Dormir Fuera</option>
-                                        <option value="EL CORTE INGLES">El Corte Ingles</option>
-                                        <option value="FARMACIA">Farmacia</option>
-                                        <option value="FERRETERIA ENCUENTRA">Ferretería</option>
-                                        <option value="FRUTAS CABELLO">Frutas</option>
-                                        <option value="GASOLINERA">Gasolinera</option>
-                                        <option value="IMPUESTO">Impuesto</option>
-                                        <option value="INTERNET">Internet</option>
-                                        <option value="LEROY MERLIN">Leroy Merlin</option>
-                                        <option value="LOTERÍA">Lotería</option>
-                                        <option value="LUZ CASA">Luz Casa</option>
-                                        <option value="MASAHORRO">MasAhorro</option>
-                                        <option value="MERCADONA">Mercadona</option>
-                                        <option value="MORESIL">Moresil</option>
-                                        <option value="OBRAMAT">Obramat</option>
-                                        <option value="PASTELERÍA ROLDÁN">Pastelería</option>
-                                        <option value="PESCADERÍA">Pescadería</option>
-                                        <option value="REGALO">Regalo</option>
-                                        <option value="SANEAMIENTOS CRUZ">Saneamientos</option>
-                                        <option value="VARIOS">Varios</option>
+                                        <option value="Carnicería Almudena">Carnicería Almudena</option>
+                                        <option value="Cenar Fuera">Cenar Fuera</option>
+                                        <option value="Comer Fuera">Comer Fuera</option>
+                                        <option value="Decathlon">Decathlon</option>
+                                        <option value="Desayunar Fuera">Desayunar Fuera</option>
+                                        <option value="Deza">Deza</option>
+                                        <option value="Disney">Disney</option>
+                                        <option value="Dormir Fuera">Dormir Fuera</option>
+                                        <option value="El Corte Ingles">El Corte Ingles</option>
+                                        <option value="Farmacia">Farmacia</option>
+                                        <option value="Ferretería Encuentra">Ferretería</option>
+                                        <option value="Frutas Cabello">Frutas</option>
+                                        <option value="Gasolinera">Gasolinera</option>
+                                        <option value="Impuesto">Impuesto</option>
+                                        <option value="Internet">Internet</option>
+                                        <option value="Leroy Merlin">Leroy Merlin</option>
+                                        <option value="Lotería">Lotería</option>
+                                        <option value="Luz Casa">Luz Casa</option>
+                                        <option value="MasAhorro">MasAhorro</option>
+                                        <option value="Mercadona">Mercadona</option>
+                                        <option value="Moresil">Moresil</option>
+                                        <option value="Obramat">Obramat</option>
+                                        <option value="Pastelería Roldán">Pastelería</option>
+                                        <option value="Pescadería">Pescadería</option>
+                                        <option value="Regalo">Regalo</option>
+                                        <option value="Saneamientos Cruz">Saneamientos</option>
+                                        <option value="Varios">Varios</option>
                                     </select>
                                 </div>
                             </div>
